@@ -7,9 +7,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Min telefon" />
-
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#0b1220" />
 
@@ -17,6 +15,8 @@
 
   <link rel="apple-touch-icon" href="telefon.png" />
   <link rel="icon" href="telefon.png" />
+
+  <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
 
   <style>
     :root{
@@ -83,9 +83,7 @@
       user-select:none;
     }
 
-    .titleLogo:active{
-      transform:scale(.96);
-    }
+    .titleLogo:active{transform:scale(.96)}
 
     h1{
       margin:0;
@@ -302,19 +300,29 @@
       padding:9px 10px;
     }
 
+    .cropArea{
+      width:100%;
+      max-height:60dvh;
+      background:#050912;
+      border-radius:16px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+
+    #cropImage{
+      display:block;
+      max-width:100%;
+    }
+
+    .cropper-view-box,
+    .cropper-face{
+      border-radius:50%;
+    }
+
     @media(max-width:390px){
-      .titleLogo{
-        width:38px;
-        height:38px;
-      }
-
-      .titleLine{
-        gap:8px;
-      }
-
-      .card{
-        min-height:215px;
-      }
+      .titleLogo{width:38px;height:38px}
+      .titleLine{gap:8px}
+      .card{min-height:215px}
     }
   </style>
 </head>
@@ -375,6 +383,24 @@
   </div>
 </div>
 
+<div class="modalBackdrop" id="cropModal">
+  <div class="modal">
+    <h2>Beskær billede</h2>
+    <p style="text-align:center;color:rgba(255,255,255,.75);margin-top:-6px;">
+      Flyt og zoom billedet, så ansigtet passer i cirklen.
+    </p>
+
+    <div class="cropArea">
+      <img id="cropImage" alt="Billede til beskæring">
+    </div>
+
+    <div class="btnRow">
+      <button class="mainBtn" id="useCropBtn">Brug billede</button>
+      <button class="lightBtn" id="cancelCropBtn">Annuller</button>
+    </div>
+  </div>
+</div>
+
 <div class="modalBackdrop" id="blockedModal">
   <div class="modal">
     <h2>Lukket</h2>
@@ -385,12 +411,15 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
+
 <script>
-  const STORAGE_KEY = "virtuelTelefonKontakterV3";
+  const STORAGE_KEY = "virtuelTelefonKontakterV4";
 
   const contactGrid = document.getElementById("contactGrid");
   const adminModal = document.getElementById("adminModal");
   const formModal = document.getElementById("formModal");
+  const cropModal = document.getElementById("cropModal");
   const blockedModal = document.getElementById("blockedModal");
 
   const hiddenAdminLogo = document.getElementById("hiddenAdminLogo");
@@ -410,10 +439,15 @@
   const cancelFormBtn = document.getElementById("cancelFormBtn");
   const closeBlockedBtn = document.getElementById("closeBlockedBtn");
 
-  let contacts = loadContacts();
+  const cropImage = document.getElementById("cropImage");
+  const useCropBtn = document.getElementById("useCropBtn");
+  const cancelCropBtn = document.getElementById("cancelCropBtn");
 
+  let contacts = loadContacts();
   let logoTapCount = 0;
   let logoTapTimer = null;
+  let cropper = null;
+  let croppedImageData = null;
 
   function loadContacts(){
     try{
@@ -478,7 +512,7 @@
       contactGrid.innerHTML = `
         <div class="empty">
           <h2>Ingen kontakter endnu</h2>
-          <p>Tryk 3 gange på telefon logoet øverst til højre, for at oprette dine kontakter.</p>
+          <p>Tryk 3 gange på telefon logoet øverst til venstre, for at oprette dine kontakter.</p>
         </div>
       `;
       return;
@@ -576,6 +610,7 @@
     nameInput.value = "";
     phoneInput.value = "";
     imageInput.value = "";
+    croppedImageData = null;
     blockStartInput.value = "22:00";
     blockEndInput.value = "08:00";
     formModal.classList.add("show");
@@ -590,24 +625,82 @@
     nameInput.value = contact.name;
     phoneInput.value = contact.phone;
     imageInput.value = "";
+    croppedImageData = null;
     blockStartInput.value = contact.blockStart;
     blockEndInput.value = contact.blockEnd;
     formModal.classList.add("show");
   }
 
-  function readImageAsDataUrl(file){
-    return new Promise((resolve, reject) => {
-      if(!file){
-        resolve(null);
-        return;
-      }
+  function openCropperWithFile(file){
+    if(!file) return;
 
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+      cropImage.src = e.target.result;
+      cropModal.classList.add("show");
+
+      setTimeout(() => {
+        if(cropper){
+          cropper.destroy();
+          cropper = null;
+        }
+
+        cropper = new Cropper(cropImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          dragMode: "move",
+          autoCropArea: 0.9,
+          responsive: true,
+          background: false,
+          movable: true,
+          zoomable: true,
+          rotatable: false,
+          scalable: false,
+          cropBoxMovable: false,
+          cropBoxResizable: false,
+          toggleDragModeOnDblclick: false
+        });
+      }, 100);
+    };
+
+    reader.readAsDataURL(file);
   }
+
+  imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+    if(file){
+      openCropperWithFile(file);
+    }
+  });
+
+  useCropBtn.addEventListener("click", () => {
+    if(!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({
+      width: 500,
+      height: 500,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: "high"
+    });
+
+    croppedImageData = canvas.toDataURL("image/jpeg", 0.86);
+
+    cropper.destroy();
+    cropper = null;
+    cropModal.classList.remove("show");
+  });
+
+  cancelCropBtn.addEventListener("click", () => {
+    if(cropper){
+      cropper.destroy();
+      cropper = null;
+    }
+
+    croppedImageData = null;
+    imageInput.value = "";
+    cropModal.classList.remove("show");
+  });
 
   async function saveForm(){
     const name = nameInput.value.trim();
@@ -626,9 +719,6 @@
       return;
     }
 
-    const file = imageInput.files[0];
-    const newImage = await readImageAsDataUrl(file);
-
     if(id){
       const contact = contacts.find(c => c.id === id);
       if(!contact) return;
@@ -638,15 +728,15 @@
       contact.blockStart = blockStart;
       contact.blockEnd = blockEnd;
 
-      if(newImage){
-        contact.image = newImage;
+      if(croppedImageData){
+        contact.image = croppedImageData;
       }
     }else{
       contacts.push({
         id: makeId(),
         name,
         phone,
-        image: newImage,
+        image: croppedImageData,
         blockStart,
         blockEnd
       });
