@@ -319,6 +319,21 @@
       border-radius:50%;
     }
 
+    .videoBox{
+      width:100%;
+      background:#050912;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid var(--stroke);
+    }
+
+    .videoBox video{
+      display:block;
+      width:100%;
+      max-height:65dvh;
+      background:#000;
+    }
+
     @media(max-width:390px){
       .titleLogo{width:38px;height:38px}
       .titleLine{gap:8px}
@@ -333,7 +348,7 @@
     <div class="titleLine">
       <img src="telefon.png" alt="Telefon" class="titleLogo" id="hiddenAdminLogo">
       <h1>Min telefon</h1>
-      <img src="telefon.png" alt="Telefon" class="titleLogo">
+      <img src="telefon.png" alt="Telefon" class="titleLogo" id="helpVideoLogo">
     </div>
     <p class="hint">Tryk på et billede for at ringe</p>
   </header>
@@ -401,6 +416,21 @@
   </div>
 </div>
 
+<div class="modalBackdrop" id="videoModal">
+  <div class="modal">
+    <h2>Instruktion</h2>
+
+    <div class="videoBox">
+      <video id="instructionVideo" controls playsinline preload="metadata">
+        <source src="instruktion.mp4" type="video/mp4">
+        Din browser kan ikke afspille videoen.
+      </video>
+    </div>
+
+    <button class="mainBtn" id="closeVideoBtn" style="margin-top:14px;">Luk video</button>
+  </div>
+</div>
+
 <div class="modalBackdrop" id="blockedModal">
   <div class="modal">
     <h2>Lukket</h2>
@@ -414,15 +444,18 @@
 <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
 <script>
-  const STORAGE_KEY = "virtuelTelefonKontakterV4";
+  const STORAGE_KEY = "virtuelTelefonKontakterV5";
 
   const contactGrid = document.getElementById("contactGrid");
   const adminModal = document.getElementById("adminModal");
   const formModal = document.getElementById("formModal");
   const cropModal = document.getElementById("cropModal");
+  const videoModal = document.getElementById("videoModal");
   const blockedModal = document.getElementById("blockedModal");
 
   const hiddenAdminLogo = document.getElementById("hiddenAdminLogo");
+  const helpVideoLogo = document.getElementById("helpVideoLogo");
+
   const closeAdminBtn = document.getElementById("closeAdminBtn");
   const newContactBtn = document.getElementById("newContactBtn");
   const adminList = document.getElementById("adminList");
@@ -443,9 +476,17 @@
   const useCropBtn = document.getElementById("useCropBtn");
   const cancelCropBtn = document.getElementById("cancelCropBtn");
 
+  const instructionVideo = document.getElementById("instructionVideo");
+  const closeVideoBtn = document.getElementById("closeVideoBtn");
+
   let contacts = loadContacts();
-  let logoTapCount = 0;
-  let logoTapTimer = null;
+
+  let leftLogoTapCount = 0;
+  let leftLogoTapTimer = null;
+
+  let rightLogoTapCount = 0;
+  let rightLogoTapTimer = null;
+
   let cropper = null;
   let croppedImageData = null;
 
@@ -513,6 +554,7 @@
         <div class="empty">
           <h2>Ingen kontakter endnu</h2>
           <p>Tryk 3 gange på telefon logoet øverst til venstre, for at oprette dine kontakter.</p>
+          <p>Tryk 3 gange på telefon logoet øverst til højre, for at se instruktionsvideoen.</p>
         </div>
       `;
       return;
@@ -602,6 +644,28 @@
   function openAdmin(){
     renderAdminList();
     adminModal.classList.add("show");
+  }
+
+  function openVideo(){
+    videoModal.classList.add("show");
+
+    try{
+      instructionVideo.currentTime = 0;
+      const playPromise = instructionVideo.play();
+
+      if(playPromise && typeof playPromise.catch === "function"){
+        playPromise.catch(() => {});
+      }
+    }catch(e){}
+  }
+
+  function closeVideo(){
+    try{
+      instructionVideo.pause();
+      instructionVideo.currentTime = 0;
+    }catch(e){}
+
+    videoModal.classList.remove("show");
   }
 
   function openNewForm(){
@@ -749,20 +813,38 @@
   }
 
   hiddenAdminLogo.addEventListener("click", () => {
-    logoTapCount++;
+    leftLogoTapCount++;
 
-    if(logoTapTimer){
-      clearTimeout(logoTapTimer);
+    if(leftLogoTapTimer){
+      clearTimeout(leftLogoTapTimer);
     }
 
-    logoTapTimer = setTimeout(() => {
-      logoTapCount = 0;
+    leftLogoTapTimer = setTimeout(() => {
+      leftLogoTapCount = 0;
     }, 1200);
 
-    if(logoTapCount >= 3){
-      logoTapCount = 0;
-      clearTimeout(logoTapTimer);
+    if(leftLogoTapCount >= 3){
+      leftLogoTapCount = 0;
+      clearTimeout(leftLogoTapTimer);
       openAdmin();
+    }
+  });
+
+  helpVideoLogo.addEventListener("click", () => {
+    rightLogoTapCount++;
+
+    if(rightLogoTapTimer){
+      clearTimeout(rightLogoTapTimer);
+    }
+
+    rightLogoTapTimer = setTimeout(() => {
+      rightLogoTapCount = 0;
+    }, 1200);
+
+    if(rightLogoTapCount >= 3){
+      rightLogoTapCount = 0;
+      clearTimeout(rightLogoTapTimer);
+      openVideo();
     }
   });
 
@@ -784,6 +866,10 @@
   closeBlockedBtn.addEventListener("click", () => {
     blockedModal.classList.remove("show");
   });
+
+  closeVideoBtn.addEventListener("click", closeVideo);
+
+  instructionVideo.addEventListener("ended", closeVideo);
 
   renderContacts();
   setInterval(renderContacts, 15000);
