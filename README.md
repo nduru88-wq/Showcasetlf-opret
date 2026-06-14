@@ -1,2 +1,2 @@
-# Showcasetlf-opret
-Her kan man selv oprette personer
+# showcasetlf-android
+muligt at opsætte på Android som en app
