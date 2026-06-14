@@ -19,14 +19,14 @@
     :root{
       --bg:#0b1220;
       --card:rgba(255,255,255,.08);
-      --card2:rgba(255,255,255,.12);
+      --card2:rgba(255,255,255,.13);
       --text:#fff;
-      --muted:rgba(255,255,255,.75);
+      --muted:rgba(255,255,255,.72);
       --stroke:rgba(255,255,255,.14);
-      --radius:22px;
-      --shadow:0 10px 26px rgba(0,0,0,.35);
       --green:#27d17c;
       --red:#ff5a5a;
+      --radius:24px;
+      --shadow:0 10px 28px rgba(0,0,0,.35);
     }
 
     *{box-sizing:border-box}
@@ -36,7 +36,7 @@
       height:100%;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
       background:
-        radial-gradient(1200px 800px at 50% 0%, rgba(80,140,255,.22), transparent 55%),
+        radial-gradient(1100px 700px at 50% 0%, rgba(80,140,255,.25), transparent 55%),
         var(--bg);
       color:var(--text);
       overscroll-behavior:none;
@@ -47,16 +47,18 @@
 
     .app{
       height:100dvh;
+      max-width:900px;
+      margin:auto;
       padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));
       display:flex;
       flex-direction:column;
       gap:12px;
-      max-width:900px;
-      margin:auto;
     }
 
     header{
+      position:relative;
       text-align:center;
+      padding:4px 46px 0;
     }
 
     h1{
@@ -70,31 +72,18 @@
       font-size:15px;
     }
 
-    .topButtons{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      margin-top:10px;
-    }
-
-    button{
-      border:0;
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:16px;
-      font-weight:900;
-      cursor:pointer;
-    }
-
-    .addBtn{
-      background:var(--green);
-      color:#062012;
-    }
-
-    .editBtn{
-      background:rgba(255,255,255,.14);
-      color:white;
+    .gear{
+      position:absolute;
+      right:0;
+      top:0;
+      width:42px;
+      height:42px;
+      border-radius:999px;
       border:1px solid var(--stroke);
+      background:rgba(255,255,255,.10);
+      color:white;
+      font-size:22px;
+      font-weight:900;
     }
 
     .grid{
@@ -104,7 +93,7 @@
       grid-template-columns:repeat(2,1fr);
       gap:14px;
       overflow:auto;
-      padding-bottom:10px;
+      padding-bottom:8px;
     }
 
     .card{
@@ -113,18 +102,18 @@
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       padding:12px;
+      min-height:230px;
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:space-between;
-      min-height:230px;
       -webkit-tap-highlight-color:transparent;
     }
 
     .card:active{transform:scale(.985)}
 
     .avatar{
-      width:min(150px,34vw);
+      width:min(154px,35vw);
       aspect-ratio:1;
       border-radius:999px;
       background:rgba(255,255,255,.10);
@@ -132,7 +121,7 @@
       overflow:hidden;
       display:grid;
       place-items:center;
-      font-size:50px;
+      font-size:54px;
       font-weight:900;
     }
 
@@ -145,9 +134,10 @@
 
     .name{
       margin:10px 0 3px;
-      font-size:clamp(18px,4.6vw,22px);
-      font-weight:900;
       text-align:center;
+      font-size:clamp(18px,4.8vw,23px);
+      font-weight:900;
+      line-height:1.05;
     }
 
     .phone{
@@ -164,18 +154,19 @@
       font-weight:900;
       font-size:14px;
       border:1px solid transparent;
+      text-align:center;
     }
 
     .tag.open{
-      background:rgba(39,209,124,.14);
+      background:rgba(39,209,124,.15);
       border-color:rgba(39,209,124,.35);
-      color:#bfffe0;
+      color:#c8ffe5;
     }
 
     .tag.closed{
-      background:rgba(255,90,90,.14);
+      background:rgba(255,90,90,.15);
       border-color:rgba(255,90,90,.35);
-      color:#ffd0d0;
+      color:#ffd2d2;
     }
 
     .empty{
@@ -185,6 +176,7 @@
       padding:40px 20px;
       border:1px dashed var(--stroke);
       border-radius:var(--radius);
+      align-self:start;
     }
 
     .modalBackdrop{
@@ -232,42 +224,46 @@
       font-size:17px;
     }
 
-    input[type="file"]{
-      padding:10px;
-    }
-
     .row{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:10px;
     }
 
-    .modalBtns{
-      display:flex;
-      gap:10px;
-      margin-top:16px;
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
     }
 
-    .saveBtn{
-      flex:1;
+    .mainBtn{
+      width:100%;
       background:var(--green);
       color:#062012;
     }
 
-    .cancelBtn{
-      flex:1;
+    .lightBtn{
       background:rgba(255,255,255,.14);
       color:white;
       border:1px solid var(--stroke);
     }
 
     .dangerBtn{
-      width:100%;
-      margin-top:10px;
       background:rgba(255,90,90,.18);
       color:#ffd0d0;
       border:1px solid rgba(255,90,90,.35);
     }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .btnRow button{flex:1}
 
     .listItem{
       display:flex;
@@ -281,14 +277,14 @@
       background:rgba(255,255,255,.06);
     }
 
-    .smallBtn{
-      padding:9px 10px;
-      font-size:14px;
+    .smallActions{
+      display:flex;
+      gap:6px;
     }
 
-    @media(max-width:370px){
-      .grid{gap:10px}
-      .card{padding:10px; min-height:210px}
+    .smallActions button{
+      font-size:14px;
+      padding:9px 10px;
     }
   </style>
 </head>
@@ -296,19 +292,23 @@
 <body>
 <div class="app">
   <header>
+    <button class="gear" id="adminBtn">⚙️</button>
     <h1>Min telefon</h1>
     <p class="hint">Tryk på et billede for at ringe</p>
-
-    <div class="topButtons">
-      <button class="addBtn" id="openAddBtn">+ Opret person</button>
-      <button class="editBtn" id="openManageBtn">Rediger</button>
-    </div>
   </header>
 
   <main class="grid" id="contactGrid"></main>
 </div>
 
-<!-- Opret / rediger modal -->
+<div class="modalBackdrop" id="adminModal">
+  <div class="modal">
+    <h2>Administrer kontakter</h2>
+    <button class="mainBtn" id="newContactBtn">+ Opret ny person</button>
+    <div id="adminList"></div>
+    <button class="lightBtn" id="closeAdminBtn" style="width:100%;margin-top:14px;">Luk</button>
+  </div>
+</div>
+
 <div class="modalBackdrop" id="formModal">
   <div class="modal">
     <h2 id="formTitle">Opret person</h2>
@@ -335,58 +335,35 @@
       </div>
     </div>
 
-    <div class="modalBtns">
-      <button class="saveBtn" id="saveBtn">Gem</button>
-      <button class="cancelBtn" id="cancelFormBtn">Annuller</button>
+    <div class="btnRow">
+      <button class="mainBtn" id="saveBtn">Gem</button>
+      <button class="lightBtn" id="cancelFormBtn">Annuller</button>
     </div>
   </div>
 </div>
 
-<!-- Redigerliste -->
-<div class="modalBackdrop" id="manageModal">
-  <div class="modal">
-    <h2>Rediger personer</h2>
-    <div id="manageList"></div>
-    <button class="cancelBtn" id="closeManageBtn" style="width:100%;margin-top:14px;">Luk</button>
-  </div>
-</div>
-
-<!-- Lukket modal -->
 <div class="modalBackdrop" id="blockedModal">
   <div class="modal">
     <h2>Lukket</h2>
     <p style="text-align:center;color:rgba(255,255,255,.82);font-size:18px;">
       Denne person kan ikke ringes til i dette tidsrum.
     </p>
-    <button class="saveBtn" id="closeBlockedBtn" style="width:100%;">OK</button>
+    <button class="mainBtn" id="closeBlockedBtn">OK</button>
   </div>
 </div>
 
 <script>
-  document.addEventListener('gesturestart', e => e.preventDefault());
-  document.addEventListener('gesturechange', e => e.preventDefault());
-  document.addEventListener('gestureend', e => e.preventDefault());
-
-  let lastTouchEnd = 0;
-  document.addEventListener('touchend', function (e) {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) e.preventDefault();
-    lastTouchEnd = now;
-  }, { passive:false });
-
-  const STORAGE_KEY = "virtuelTelefonKontakterV1";
+  const STORAGE_KEY = "virtuelTelefonKontakterV2";
 
   const contactGrid = document.getElementById("contactGrid");
-
+  const adminModal = document.getElementById("adminModal");
   const formModal = document.getElementById("formModal");
-  const manageModal = document.getElementById("manageModal");
   const blockedModal = document.getElementById("blockedModal");
 
-  const openAddBtn = document.getElementById("openAddBtn");
-  const openManageBtn = document.getElementById("openManageBtn");
-  const cancelFormBtn = document.getElementById("cancelFormBtn");
-  const closeManageBtn = document.getElementById("closeManageBtn");
-  const closeBlockedBtn = document.getElementById("closeBlockedBtn");
+  const adminBtn = document.getElementById("adminBtn");
+  const closeAdminBtn = document.getElementById("closeAdminBtn");
+  const newContactBtn = document.getElementById("newContactBtn");
+  const adminList = document.getElementById("adminList");
 
   const formTitle = document.getElementById("formTitle");
   const editId = document.getElementById("editId");
@@ -395,8 +372,10 @@
   const imageInput = document.getElementById("imageInput");
   const blockStartInput = document.getElementById("blockStartInput");
   const blockEndInput = document.getElementById("blockEndInput");
+
   const saveBtn = document.getElementById("saveBtn");
-  const manageList = document.getElementById("manageList");
+  const cancelFormBtn = document.getElementById("cancelFormBtn");
+  const closeBlockedBtn = document.getElementById("closeBlockedBtn");
 
   let contacts = loadContacts();
 
@@ -416,8 +395,8 @@
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
 
-  function parseHHMM(s){
-    const parts = s.split(":").map(Number);
+  function parseHHMM(value){
+    const parts = value.split(":").map(Number);
     return parts[0] * 60 + parts[1];
   }
 
@@ -444,6 +423,18 @@
     return phone.replace(/\s+/g, "");
   }
 
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(m){
+      return ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      })[m];
+    });
+  }
+
   function renderContacts(){
     contactGrid.innerHTML = "";
 
@@ -451,7 +442,7 @@
       contactGrid.innerHTML = `
         <div class="empty">
           <h2>Ingen personer endnu</h2>
-          <p>Tryk på “Opret person” for at tilføje den første.</p>
+          <p>Tryk på tandhjulet ⚙️ for at oprette den første person.</p>
         </div>
       `;
       return;
@@ -491,11 +482,15 @@
     });
   }
 
-  function renderManageList(){
-    manageList.innerHTML = "";
+  function renderAdminList(){
+    adminList.innerHTML = "";
 
     if(contacts.length === 0){
-      manageList.innerHTML = `<p style="text-align:center;color:rgba(255,255,255,.75);">Ingen personer oprettet endnu.</p>`;
+      adminList.innerHTML = `
+        <p style="text-align:center;color:rgba(255,255,255,.72);">
+          Ingen personer oprettet endnu.
+        </p>
+      `;
       return;
     }
 
@@ -506,16 +501,18 @@
       item.innerHTML = `
         <div>
           <strong>${escapeHtml(contact.name)}</strong><br>
-          <span style="color:rgba(255,255,255,.7);font-size:14px;">${escapeHtml(contact.phone)}</span>
+          <span style="color:rgba(255,255,255,.7);font-size:14px;">
+            ${escapeHtml(contact.phone)}
+          </span>
         </div>
-        <div style="display:flex;gap:6px;">
-          <button class="smallBtn editBtn">Ret</button>
-          <button class="smallBtn dangerBtn" style="margin:0;width:auto;">Slet</button>
+        <div class="smallActions">
+          <button class="lightBtn">Ret</button>
+          <button class="dangerBtn">Slet</button>
         </div>
       `;
 
-      item.querySelector(".editBtn").addEventListener("click", () => {
-        manageModal.classList.remove("show");
+      item.querySelector(".lightBtn").addEventListener("click", () => {
+        adminModal.classList.remove("show");
         openEditForm(contact.id);
       });
 
@@ -524,11 +521,11 @@
           contacts = contacts.filter(c => c.id !== contact.id);
           saveContacts();
           renderContacts();
-          renderManageList();
+          renderAdminList();
         }
       });
 
-      manageList.appendChild(item);
+      adminList.appendChild(item);
     });
   }
 
@@ -557,10 +554,6 @@
     formModal.classList.add("show");
   }
 
-  function closeForm(){
-    formModal.classList.remove("show");
-  }
-
   function readImageAsDataUrl(file){
     return new Promise((resolve, reject) => {
       if(!file){
@@ -569,10 +562,8 @@
       }
 
       const reader = new FileReader();
-
       reader.onload = () => resolve(reader.result);
       reader.onerror = () => reject(reader.error);
-
       reader.readAsDataURL(file);
     });
   }
@@ -622,33 +613,28 @@
 
     saveContacts();
     renderContacts();
-    closeForm();
+    renderAdminList();
+    formModal.classList.remove("show");
   }
 
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, function(m){
-      return ({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#039;"
-      })[m];
-    });
-  }
-
-  openAddBtn.addEventListener("click", openNewForm);
-
-  openManageBtn.addEventListener("click", () => {
-    renderManageList();
-    manageModal.classList.add("show");
+  adminBtn.addEventListener("click", () => {
+    renderAdminList();
+    adminModal.classList.add("show");
   });
 
-  cancelFormBtn.addEventListener("click", closeForm);
+  closeAdminBtn.addEventListener("click", () => {
+    adminModal.classList.remove("show");
+  });
+
+  newContactBtn.addEventListener("click", () => {
+    adminModal.classList.remove("show");
+    openNewForm();
+  });
+
   saveBtn.addEventListener("click", saveForm);
 
-  closeManageBtn.addEventListener("click", () => {
-    manageModal.classList.remove("show");
+  cancelFormBtn.addEventListener("click", () => {
+    formModal.classList.remove("show");
   });
 
   closeBlockedBtn.addEventListener("click", () => {
