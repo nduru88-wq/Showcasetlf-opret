@@ -15,6 +15,9 @@
 
   <title>Min telefon</title>
 
+  <link rel="apple-touch-icon" href="telefon.png" />
+  <link rel="icon" href="telefon.png" />
+
   <style>
     :root{
       --bg:#0b1220;
@@ -56,34 +59,45 @@
     }
 
     header{
-      position:relative;
       text-align:center;
-      padding:4px 46px 0;
+      padding-top:4px;
+    }
+
+    .titleLine{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+    }
+
+    .titleLogo{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      object-fit:contain;
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--stroke);
+      padding:5px;
+      box-shadow:0 6px 18px rgba(0,0,0,.25);
+      -webkit-tap-highlight-color:transparent;
+      user-select:none;
+    }
+
+    .titleLogo:active{
+      transform:scale(.96);
     }
 
     h1{
       margin:0;
       font-size:clamp(24px,6vw,34px);
+      line-height:1.05;
+      white-space:nowrap;
     }
 
     .hint{
-      margin:6px 0 0;
+      margin:8px 0 0;
       color:var(--muted);
       font-size:15px;
-    }
-
-    .gear{
-      position:absolute;
-      right:0;
-      top:0;
-      width:42px;
-      height:42px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.10);
-      color:white;
-      font-size:22px;
-      font-weight:900;
     }
 
     .grid{
@@ -177,6 +191,7 @@
       border:1px dashed var(--stroke);
       border-radius:var(--radius);
       align-self:start;
+      line-height:1.4;
     }
 
     .modalBackdrop{
@@ -286,14 +301,32 @@
       font-size:14px;
       padding:9px 10px;
     }
+
+    @media(max-width:390px){
+      .titleLogo{
+        width:38px;
+        height:38px;
+      }
+
+      .titleLine{
+        gap:8px;
+      }
+
+      .card{
+        min-height:215px;
+      }
+    }
   </style>
 </head>
 
 <body>
 <div class="app">
   <header>
-    <button class="gear" id="adminBtn">⚙️</button>
-    <h1>Min telefon</h1>
+    <div class="titleLine">
+      <img src="telefon.png" alt="Telefon" class="titleLogo" id="hiddenAdminLogo">
+      <h1>Min telefon</h1>
+      <img src="telefon.png" alt="Telefon" class="titleLogo">
+    </div>
     <p class="hint">Tryk på et billede for at ringe</p>
   </header>
 
@@ -353,14 +386,14 @@
 </div>
 
 <script>
-  const STORAGE_KEY = "virtuelTelefonKontakterV2";
+  const STORAGE_KEY = "virtuelTelefonKontakterV3";
 
   const contactGrid = document.getElementById("contactGrid");
   const adminModal = document.getElementById("adminModal");
   const formModal = document.getElementById("formModal");
   const blockedModal = document.getElementById("blockedModal");
 
-  const adminBtn = document.getElementById("adminBtn");
+  const hiddenAdminLogo = document.getElementById("hiddenAdminLogo");
   const closeAdminBtn = document.getElementById("closeAdminBtn");
   const newContactBtn = document.getElementById("newContactBtn");
   const adminList = document.getElementById("adminList");
@@ -378,6 +411,9 @@
   const closeBlockedBtn = document.getElementById("closeBlockedBtn");
 
   let contacts = loadContacts();
+
+  let logoTapCount = 0;
+  let logoTapTimer = null;
 
   function loadContacts(){
     try{
@@ -441,8 +477,8 @@
     if(contacts.length === 0){
       contactGrid.innerHTML = `
         <div class="empty">
-          <h2>Ingen personer endnu</h2>
-          <p>Tryk på tandhjulet ⚙️ for at oprette den første person.</p>
+          <h2>Ingen kontakter endnu</h2>
+          <p>Tryk 3 gange på telefon logoet øverst til højre, for at oprette dine kontakter.</p>
         </div>
       `;
       return;
@@ -527,6 +563,11 @@
 
       adminList.appendChild(item);
     });
+  }
+
+  function openAdmin(){
+    renderAdminList();
+    adminModal.classList.add("show");
   }
 
   function openNewForm(){
@@ -617,9 +658,22 @@
     formModal.classList.remove("show");
   }
 
-  adminBtn.addEventListener("click", () => {
-    renderAdminList();
-    adminModal.classList.add("show");
+  hiddenAdminLogo.addEventListener("click", () => {
+    logoTapCount++;
+
+    if(logoTapTimer){
+      clearTimeout(logoTapTimer);
+    }
+
+    logoTapTimer = setTimeout(() => {
+      logoTapCount = 0;
+    }, 1200);
+
+    if(logoTapCount >= 3){
+      logoTapCount = 0;
+      clearTimeout(logoTapTimer);
+      openAdmin();
+    }
   });
 
   closeAdminBtn.addEventListener("click", () => {
